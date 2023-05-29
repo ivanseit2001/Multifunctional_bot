@@ -9,7 +9,8 @@ const fs = require('fs');
 const path = require('path');
 const ffmpeg = require('ffmpeg-static');
 const { VoiceConnection, joinVoiceChannel } = require('@discordjs/voice');
-
+const Canvas=require('canvas')
+const welcome =require("./welcome");
 
 
 const  client = new Client({
@@ -69,6 +70,7 @@ client.on("ready", () => {
         .then(() => console.log('Successfully updated commands for guild ' + guildId))
         .catch(console.error);
     }
+    welcome(client);
 });
 
 client.on("interactionCreate", async interaction => {
