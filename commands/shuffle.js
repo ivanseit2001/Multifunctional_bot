@@ -18,10 +18,10 @@ module.exports = {
         .setDescription("shuffle the song list"),
 
     execute: async ({ client, interaction }) => {
-        const queue = client.player.getQueue(interaction.guildId)
+        const queue = client.player.nodes.get(interaction.guildId)
 
         // check if there are songs in the queue
-        if (!queue || !queue.playing)
+        if (!queue || !queue.node.isPlaying())
         {
             await interaction.reply("No songs!\r\nhttps://tenor.com/view/bocchi-bocchi-the-rock-non-linear-gif-27023528");
             return;
@@ -39,7 +39,7 @@ module.exports = {
         //     await queue.addTrack(shuffle_list[y][1])
         //     await queue.addTrack(shuffle_list[y][2])
         // }
-        queue.shuffle()
+        queue.tracks.shuffle();
 
         await interaction.reply({
             embeds: [

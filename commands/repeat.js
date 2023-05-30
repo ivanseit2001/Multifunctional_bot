@@ -20,7 +20,7 @@ module.exports = {
 	execute: async ({ client, interaction }) => {
         if (!interaction.member.voice.channel) return interaction.reply("No one's here!\r\nhttps://tenor.com/view/hitori-gotou-bocchi-rock-bocchi-the-rock-bozaro-cry-gif-26906525");
         // Get the current queue
-		const queue = client.player.getQueue(interaction.guildId)
+		const queue = client.player.nodes.get(interaction.guildId)
 
 		if (!queue)
 		{

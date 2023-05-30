@@ -26,10 +26,10 @@ module.exports = {
         ,
 
     execute: async ({ client, interaction }) => {
-        const queue = client.player.getQueue(interaction.guildId)
+        const queue = client.player.nodes.get(interaction.guildId)
 
         // check if there are songs in the queue
-        if (!queue || !queue.playing)
+        if (!queue || !queue.isPlaying())
         {
             await interaction.reply("No songs!\nhttps://tenor.com/view/boowomp-nijika-ijichi-nijika-ichiji-boowomp-gif-27229601");
             return;
@@ -47,7 +47,7 @@ module.exports = {
                 return interaction.reply("Out of range\r\nhttps://tenor.com/view/boowomp-nijika-ijichi-nijika-ichiji-boowomp-gif-27229601")
             }
         
-            queue.remove(+track_number)
+            queue.node.remove(+track_number)
         }
 
         if (interaction.options.getSubcommand()==="range"){
@@ -59,7 +59,7 @@ module.exports = {
             }
 
             for (let i=+ending;i>=+opening;i--){
-                queue.remove(i)
+                queue.node.remove(i)
             }
         }
         

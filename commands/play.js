@@ -1,6 +1,6 @@
 const { SlashCommandBuilder } = require("@discordjs/builders")
 const { EmbedBuilder } = require("discord.js")
-const { QueryType } = require("discord-player")
+const { QueryType,useMasterPlayer } = require("discord-player")
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -31,7 +31,7 @@ module.exports = {
 		if (!interaction.member.voice.channel) return interaction.reply("You are not here!\r\nhttps://media.tenor.com/P_Qu80HM5_MAAAAd/bocchi-the-rock-bocchi.gif");
 
         // Create a play queue for the server
-		const queue = await client.player.createQueue(interaction.guild);
+		const queue = await client.player.nodes.create(interaction.guild);
         
         // Wait until you are connected to the channel
 		if (!queue.connection) await queue.connect(interaction.member.voice.channel)
@@ -117,8 +117,8 @@ module.exports = {
            
         //  }
         // Play the song
-        if (!queue.playing) await queue.play();
-        
+        if (!queue.node.isPlaying()) await queue.node.play();
+        console.log("Passed node playing")
         // Respond with the embed containing information about the player
         await interaction.reply({
             embeds: [embed]

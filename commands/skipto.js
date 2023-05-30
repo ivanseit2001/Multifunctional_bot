@@ -9,10 +9,10 @@ module.exports = {
         ,
 
     execute: async ({ client, interaction }) => {
-        const queue = client.player.getQueue(interaction.guildId)
+        const queue = client.player.nodes.get(interaction.guildId)
 
         // check if there are songs in the queue
-        if (!queue || !queue.playing)
+        if (!queue || !queue.node.isPlaying())
         {
             await interaction.reply("No songs!\nhttps://tenor.com/view/bocchi-bocchi-the-rock-non-linear-gif-27023528");
             return;
@@ -23,14 +23,14 @@ module.exports = {
                 return interaction.reply("This is not a number\r\nhttps://tenor.com/view/bocchi-bocchi-the-rock-non-linear-gif-27023528")
             }
 
-        if(queue.tracks[+track_number]==null){
+        if(queue.tracks.data[+track_number]==null){
                 return interaction.reply("Out of range\r\nhttps://tenor.com/view/bocchi-bocchi-the-rock-non-linear-gif-27023528")
             }
         
         // for (let i=+track_number;i>0;i--){
         //     queue.remove(i)
         //     }
-        queue.skipTo(+track_number)
+        queue.node.skipTo(+track_number)
 
 
         

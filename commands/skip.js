@@ -8,7 +8,7 @@ module.exports = {
 	execute: async ({ client, interaction }) => {
 
         // Get the queue for the server
-		const queue = client.player.getQueue(interaction.guildId)
+		const queue = client.player.nodes.get(interaction.guildId)
 
         // If there is no queue, return
 		if (!queue)
@@ -17,10 +17,10 @@ module.exports = {
             return;
         }
 
-        const currentSong = queue.current
+        const currentSong = queue.currentTrack
 
         // Skip the current song
-		queue.skip()
+		queue.node.skip()
 
         // Return an embed to the user saying the song has been skipped
         await interaction.reply({
