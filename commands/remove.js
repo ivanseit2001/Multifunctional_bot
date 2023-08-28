@@ -43,7 +43,7 @@ module.exports = {
                 return interaction.reply("This is not a number\r\nhttps://tenor.com/view/boowomp-nijika-ijichi-nijika-ichiji-boowomp-gif-27229601")
             }
 
-            if(queue.tracks[+track_number]==null){
+            if(queue.tracks.data[+track_number]==null){
                 return interaction.reply("Out of range\r\nhttps://tenor.com/view/boowomp-nijika-ijichi-nijika-ichiji-boowomp-gif-27229601")
             }
         
@@ -54,7 +54,7 @@ module.exports = {
             let opening=interaction.options.getString("beginning")
             let ending=interaction.options.getString("ending")
             if (isNaN(+opening) ||isNaN(+ending)){return interaction.reply("This is not a number\r\nhttps://tenor.com/view/boowomp-nijika-ijichi-nijika-ichiji-boowomp-gif-27229601")}
-            if(queue.tracks[+opening]==null||queue.tracks[+ending]==null){
+            if(queue.tracks.data[+opening]==null||queue.tracks.data[+ending]==null){
                 return interaction.reply("Out of range\r\nhttps://tenor.com/view/boowomp-nijika-ijichi-nijika-ichiji-boowomp-gif-27229601")
             }
 

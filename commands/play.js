@@ -17,13 +17,15 @@ module.exports = {
         .addSubcommand(subcommand =>
 			subcommand
 				.setName("playlist")
-				.setDescription("Plays a playlist from YT")
+				.setDescription("Plays a playlist from soundcloud,spotify or youtube")
 				.addStringOption(option => option.setName("url").setDescription("the playlist's url").setRequired(true))
+                .addStringOption(option=>option.setName('shuffle')
+                .setDescription("1 if you want shuffling. Otherwise no shuffling"))
 		)
 		.addSubcommand(subcommand =>
 			subcommand
 				.setName("song")
-				.setDescription("Plays a single song from YT")
+				.setDescription("Plays a single song from soundcloud,spotify or youtube")
 				.addStringOption(option => option.setName("url").setDescription("the song's url").setRequired(true))
 		),
 	execute: async ({ client, interaction }) => {
@@ -86,7 +88,9 @@ module.exports = {
             embed
                 .setDescription(`**${result.tracks.length} songs from [${playlist.title}](${playlist.url})** have been added to the Queue`)
                 .setThumbnail(playlist.thumbnail.url)
-
+                let shuffle=interaction.options.getString('shuffle')
+                if (shuffle=="1"){
+                queue.tracks.shuffle();}
 		} 
         else if (interaction.options.getSubcommand() === "search") {
 
@@ -94,13 +98,14 @@ module.exports = {
             let url = interaction.options.getString("searchterms")
             const result = await client.player.search(url, {
                 requestedBy: interaction.user,
-                searchEngine: QueryType.AUTO
+                searchEngine: QueryType.YOUTUBE
             })
 
             // finish if no tracks were found
             if (result.tracks.length === 0)
                 return interaction.editReply("No results")
-        
+            
+           // await interaction.reply("adding songs")
             // Add the track to the queue
             const song = result.tracks[0]
             await queue.addTrack(song)

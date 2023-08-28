@@ -3,13 +3,13 @@ require('dotenv').config();
 const {REST} = require('@discordjs/rest');
 const { Routes } = require('discord-api-types/v9');
 const { Client, GatewayIntentBits, Collection, VoiceChannel } = require("discord.js");
-const { Player } = require("discord-player");
+const { Player,extractors } = require("discord-player");
 const { VoiceConnectionStatus } = require('@discordjs/voice');
 const fs = require('fs');
 const path = require('path');
 const ffmpeg = require('ffmpeg-static');
 const { VoiceConnection, joinVoiceChannel } = require('@discordjs/voice');
-const Canvas=require('canvas')
+const { SpotifyExtractor, YoutubeExtractor }=require('@discord-player/extractor');
 const welcome =require("./welcome");
 
 
@@ -26,7 +26,7 @@ const  client = new Client({
       GatewayIntentBits.GuildVoiceStates,
         ],
   });
-
+  
 // List of all commands
 const commands = [];
 client.commands = new Collection();
@@ -54,7 +54,7 @@ client.player = new Player(client, {
     }
 })
 
-
+client.player.extractors.loadDefault();
 
 
 client.on("ready", () => {
@@ -70,7 +70,7 @@ client.on("ready", () => {
         .then(() => console.log('Successfully updated commands for guild ' + guildId))
         .catch(console.error);
     }
-    welcome(client);
+    welcome(client)
 });
 
 client.on("interactionCreate", async interaction => {
@@ -103,7 +103,7 @@ client.on("interactionCreate", async interaction => {
     catch(error)
     {
         console.error(error);
-        await interaction.reply({content: "NIJIKA.EXE IS NOT WORKING \nhttps://tenor.com/view/bocchi-the-rock-bocchi-the-rock-gif-nijika-nijika-ijichi-gif-27263161"});
+        await interaction.deferReply({content: "NIJIKA.EXE IS NOT WORKING \nhttps://tenor.com/view/bocchi-the-rock-bocchi-the-rock-gif-nijika-nijika-ijichi-gif-27263161"});
     }
     
 });

@@ -9,10 +9,10 @@ module.exports={
     .addStringOption(option=>option.setName("second").setDescription("enter the second").setRequired(true)),
 
 execute: async ({ client, interaction }) => {
-    const queue = client.player.getQueue(interaction.guildId)
+    const queue = client.player.nodes.get(interaction.guildId)
     const currentSong=queue.current
     // check if there are songs in the queue
-    if (!queue || !queue.playing)
+    if (!queue || !queue.node.isPlaying())
     {
         await interaction.reply("No songs!\nhttps://media.tenor.com/P_Qu80HM5_MAAAAd/bocchi-the-rock-bocchi.gif");
         return;
@@ -24,7 +24,7 @@ execute: async ({ client, interaction }) => {
     }
     Milliseconds=(+Minute)*60+(+Seconds)
     console.log(Milliseconds)
-    await queue.seek(Milliseconds*1000)
+    await queue.node.seek(Milliseconds*1000)
     await interaction.reply({
         embeds: [
             new EmbedBuilder()
