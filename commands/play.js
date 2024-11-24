@@ -84,10 +84,11 @@ module.exports = {
                 await queue.addTrack(result.tracks[i])
                 // await queue.addTrack(result.tracks[i])
             }
+            
             //await queue.addTracks(result.tracks)
             embed
                 .setDescription(`**${result.tracks.length} songs from [${playlist.title}](${playlist.url})** have been added to the Queue`)
-                .setThumbnail(playlist.thumbnail.url)
+                .setThumbnail(result.tracks[0].thumbnail)
                 let shuffle=interaction.options.getString('shuffle')
                 if (shuffle=="1"){
                 queue.tracks.shuffle();}
