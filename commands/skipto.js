@@ -23,14 +23,14 @@ module.exports = {
                 return interaction.reply("This is not a number\r\nhttps://tenor.com/view/bocchi-bocchi-the-rock-non-linear-gif-27023528")
             }
 
-        if(queue.tracks.data[+track_number]==null){
+        if(queue.tracks.data[+track_number-1]==null){
                 return interaction.reply("Out of range\r\nhttps://tenor.com/view/bocchi-bocchi-the-rock-non-linear-gif-27023528")
             }
         
         // for (let i=+track_number;i>0;i--){
         //     queue.remove(i)
         //     }
-        queue.node.skipTo(+track_number)
+        queue.node.skipTo(+track_number-1)
 
 
         

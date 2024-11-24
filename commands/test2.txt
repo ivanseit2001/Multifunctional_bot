@@ -1,0 +1,98 @@
+const { SlashCommandBuilder } = require("@discordjs/builders")
+const { EmbedBuilder, MessageEmbed } = require("discord.js")
+
+module.exports = {
+    data: new SlashCommandBuilder()
+        .setName("queues2")
+        .setDescription("shows first 10 songs in the queue"),
+
+    execute: async ({ client, interaction }) => {
+        const queue = client.player.nodes.get(interaction.guildId)
+        console.log(interaction.options)
+        // check if there are songs in the queue
+        if (!queue || !queue.node.isPlaying())
+        {
+            await interaction.reply("No songs!\nhttps://i.pinimg.com/originals/4c/7c/66/4c7c669c255123a68c2474ccf5ab7ab9.gif");
+            return;
+        }
+        let current_page=0
+        // Get the first 20 songs in the queue
+        const embedss=[]
+        let k=10;
+        for(let i=0;i< queue.tracks.data.length; i += 10){
+            const queueString = queue.tracks.data.slice(0, 10);
+            let j=i;
+            k+=10;
+            const info=queueString.map(song => `${j} - [${song.duration}]\` ${song.title} - <@${song.requestedBy.id}>`).join('\n')
+            const currentSong = queue.currentTrack;
+            const progress=queue.node.createProgressBar();
+            const collector=new EmbedBuilder()
+            .setDescription(`**Currently Playing**\n` + 
+                (currentSong ? `\`[${currentSong.duration}]\` ${currentSong.title} - <@${currentSong.requestedBy.id}>` : "None")
+                +`\n`+progress+
+                `\n\n**Queue**\n${info}`
+            )
+            .setThumbnail(currentSong.thumbnail)
+            embedss.push(collector)
+        }
+ 
+
+        let currentPage=0;
+        const msg = await interaction.reply({
+            embeds:[
+                new EmbedBuilder()
+                .setDescription(embedss[currentPage])
+            ],
+        fetchReply:true
+    });
+        await msg.react('⬅️');
+        await msg.react('➡️');
+
+        const collectorFilter = (reaction, interaction) => ['⬅️', '➡️'].includes(reaction.emoji.name) && (interaction.user.id);
+        const collectEmotes=msg.createReactionCollector({ filter: collectorFilter, time: 15000 });
+        collectEmotes.on('collect',async(reaction,user)=>{
+            try {
+                if (reaction.emoji.name === '➡️') {
+                    if (currentPage < embedss.length - 1) {
+                        currentPage++;
+                        msg.edit(`**Current Page - ${currentPage + 1}/${embedss.length}**`, embedss[currentPage]);
+                    } 
+                } else if (reaction.emoji.name === '⬅️') {
+                    if (currentPage !== 0) {
+                        --currentPage;
+                        msg.edit(`**Current Page - ${currentPage + 1}/${embedss.length}**`, embedss[currentPage]);
+                    }
+                } else {
+                    collector.stop();
+                    reaction.message.reactions.removeAll();
+                    msg.delete();
+                }
+                await reaction.users.remove(message.author.id);
+              } catch{
+                console.log("An error occured")
+
+              }
+        })
+        
+    }
+
+}
+
+function generateQueueEmbed(message, queue) {
+    const embeds = [];
+    let k = 10;
+    for (let i = 0; i< queue.tracks.data.length; i += 10) {
+        const current = queue.slice(i, k);
+        let j = i;
+        k += 10;
+        const info = current.map(track => `${++j} - [${track.title}](${track.url})`).join('\n');
+        const embed = new MessageEmbed()
+            .setTitle('Song Queue\n')
+            .setThumbnail(message.guild.iconURL())
+            .setColor("#F8AA2A")
+            .setDescription(`**Current Song - [${queue[0].title}](${queue[0].url})**\n\n${info}`)
+            .setTimestamp();
+        embeds.push(embed);
+    }
+    return embeds;
+}

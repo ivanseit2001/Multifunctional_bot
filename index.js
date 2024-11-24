@@ -10,8 +10,8 @@ const path = require('path');
 const ffmpeg = require('ffmpeg-static');
 const { VoiceConnection, joinVoiceChannel } = require('@discordjs/voice');
 const { SpotifyExtractor, YoutubeExtractor }=require('@discord-player/extractor');
-const welcome =require("./welcome");
-
+// const welcome =require("./welcome");
+const { YoutubeiExtractor } = require("discord-player-youtubei")
 
 const  client = new Client({
     intents: [
@@ -41,22 +41,29 @@ for(const file of commandFiles)
     client.commands.set(command.data.name, command);
     commands.push(command.data.toJSON());
 }
-
 // Add the player on the client
 client.player = new Player(client, {
-    ytdlOptions: {
-        quality: "highestaudio",
-        highWaterMark: 1 << 25
+    // ytdlOptions: {
+    //     quality: "highestaudio",
+    //     highWaterMark: 1 << 25
             
-    } ,ffmpegOptions: {
+    // } ,
+    ffmpegOptions: {
         before_options: '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5',
         options: '-vn',
     }
 })
 
-client.player.extractors.loadDefault();
-
-
+client.player.extractors.register(YoutubeiExtractor,{
+    authentication:process.env.YOUTUBE_ACCESS_STRING||"",
+    streamOptions:{
+        useClient:"ANDROID"
+    }
+})
+client.player.extractors.loadDefault((ext)=>!["YouTubeExtractor"].includes(ext))
+// client.player.extractors.loadDefault();
+console.log(client.player.scanDeps())
+client.on('debug', (message) => console.log(message));
 client.on("ready", () => {
     // Get all ids of the servers
     const guild_ids = client.guilds.cache.map(guild => guild.id);
@@ -70,7 +77,7 @@ client.on("ready", () => {
         .then(() => console.log('Successfully updated commands for guild ' + guildId))
         .catch(console.error);
     }
-    welcome(client)
+    // welcome(client)
 });
 
 client.on("interactionCreate", async interaction => {
@@ -103,7 +110,10 @@ client.on("interactionCreate", async interaction => {
     catch(error)
     {
         console.error(error);
-        await interaction.deferReply({content: "NIJIKA.EXE IS NOT WORKING \nhttps://tenor.com/view/bocchi-the-rock-bocchi-the-rock-gif-nijika-nijika-ijichi-gif-27263161"});
+        try
+       { await interaction.deferReply({content: "NIJIKA.EXE IS NOT WORKING \nhttps://tenor.com/view/bocchi-the-rock-bocchi-the-rock-gif-nijika-nijika-ijichi-gif-27263161"});}catch(e){
+        console.log(e)
+       }
     }
     
 });
