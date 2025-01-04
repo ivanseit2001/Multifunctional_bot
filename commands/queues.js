@@ -23,13 +23,13 @@ module.exports = {
             const queueString = queue.tracks.data.slice(i, k);
             let j=i;
             k+=10;
-            const info=queueString.map(song => `${++j} - [${song.duration}]\` ${song.title} - <@${song.requestedBy.id}>`).join('\n')
+            const info=queueString.map(song => `${++j} - [${song.duration}]\` [${song.title}](${song.url}) - <@${song.requestedBy.id}>`).join('\n')
             const currentSong = queue.currentTrack;
             
             const progress=queue.node.createProgressBar();
             const collector=new EmbedBuilder()
             .setDescription(`**Currently Playing**\n` + 
-                (currentSong ? `\`[${currentSong.duration}]\` ${currentSong.title} - <@${currentSong.requestedBy.id}>` : "None")
+                (currentSong ? `\`[${currentSong.duration}]\` [${currentSong.title}](${currentSong.url}) - <@${currentSong.requestedBy.id}>` : "None")
                 +`\n`+progress+
                 `\n\n**Queue**\n${info}`
             )

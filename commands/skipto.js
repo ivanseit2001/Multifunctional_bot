@@ -31,15 +31,17 @@ module.exports = {
         //     queue.remove(i)
         //     }
         queue.node.skipTo(+track_number-1)
-
+        var currentSong = queue.currentTrack;
 
         
         
         await interaction.reply({
             embeds: [
                 new EmbedBuilder()
-                    .setDescription(`Songs skipped`
-                    )
+                    .setTitle(currentSong.title)
+                    .setURL(currentSong.url)
+                    .setThumbnail(currentSong.thumbnail)
+                    .setDescription(`Skippped to ${currentSong.title}`)
                     
             ]
         })
