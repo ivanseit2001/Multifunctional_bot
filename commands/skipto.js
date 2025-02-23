@@ -26,7 +26,7 @@ module.exports = {
         if(queue.tracks.data[+track_number-1]==null){
                 return interaction.reply("Out of range\r\nhttps://tenor.com/view/bocchi-bocchi-the-rock-non-linear-gif-27023528")
             }
-        
+        const target_track=queue.tracks.data[+track_number-1]
         // for (let i=+track_number;i>0;i--){
         //     queue.remove(i)
         //     }
@@ -38,10 +38,10 @@ module.exports = {
         await interaction.reply({
             embeds: [
                 new EmbedBuilder()
-                    .setTitle(currentSong.title)
-                    .setURL(currentSong.url)
-                    .setThumbnail(currentSong.thumbnail)
-                    .setDescription(`Skippped to ${currentSong.title}`)
+                    .setTitle(target_track.title)
+                    .setURL(target_track.url)
+                    .setThumbnail(target_track.thumbnail)
+                    .setDescription(`Skippped to ${target_track.title}`)
                     
             ]
         })
