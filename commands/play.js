@@ -37,7 +37,7 @@ module.exports = {
         
         // Wait until you are connected to the channel
 		if (!queue.connection) await queue.connect(interaction.member.voice.channel)
-        if (queue.connection) (console.log(interaction.user.id))
+        // if (queue.connection) (console.log(interaction.user.id))
         //if (interaction.user.id!="678530314552868893") return interaction.reply("You are not allowed to use it")
 
 		let embed = new EmbedBuilder()

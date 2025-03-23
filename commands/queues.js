@@ -8,7 +8,7 @@ module.exports = {
 
     execute: async ({ client, interaction }) => {
         const queue = client.player.nodes.get(interaction.guildId)
-        console.log(interaction.options)
+        // console.log(interaction.options)
         // check if there are songs in the queue
         if (!queue || !queue.node.isPlaying())
         {
