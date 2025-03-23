@@ -16,7 +16,7 @@ const ffmpeg = require("ffmpeg-static");
 const { VoiceConnection, joinVoiceChannel } = require("@discordjs/voice");
 const { DefaultExtractors } = require("@discord-player/extractor");
 // const welcome =require("./welcome");
-const { YoutubeiExtractor } = require("discord-player-youtubei");
+const { YoutubeiExtractor,generateOauthTokens } = require("discord-player-youtubei");
 
 const client = new Client({
   intents: [
@@ -31,7 +31,7 @@ const client = new Client({
     GatewayIntentBits.GuildVoiceStates,
   ],
 });
-
+//console.log("This is oauth",generateOauthTokens())
 // List of all commands
 const commands = [];
 client.commands = new Collection();
@@ -64,11 +64,11 @@ extractors.push(YoutubeiExtractor)
 console.log("Extractors", extractors);
 client.player.extractors.register(YoutubeiExtractor,{
     authentication:process.env.YOUTUBE_ACCESS_STRING||"",
-    streamOptions:{
-        useClient:"ANDROID"
-    }
+     streamOptions:{
+         useClient:"IOS"
+     }
 })
-client.player.extractors.loadMulti(extractors);
+client.player.extractors.loadMulti([YoutubeiExtractor]);
 // client.player.extractors.loadDefault();
 console.log(client.player.scanDeps());
 client.on("debug", (message) => console.log(message));
