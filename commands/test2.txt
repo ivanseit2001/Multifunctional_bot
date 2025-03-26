@@ -1,98 +1,34 @@
-const { SlashCommandBuilder } = require("@discordjs/builders")
-const { EmbedBuilder, MessageEmbed } = require("discord.js")
-
-module.exports = {
-    data: new SlashCommandBuilder()
-        .setName("queues2")
-        .setDescription("shows first 10 songs in the queue"),
-
-    execute: async ({ client, interaction }) => {
-        const queue = client.player.nodes.get(interaction.guildId)
-        console.log(interaction.options)
-        // check if there are songs in the queue
-        if (!queue || !queue.node.isPlaying())
-        {
-            await interaction.reply("No songs!\nhttps://i.pinimg.com/originals/4c/7c/66/4c7c669c255123a68c2474ccf5ab7ab9.gif");
-            return;
-        }
-        let current_page=0
-        // Get the first 20 songs in the queue
-        const embedss=[]
-        let k=10;
-        for(let i=0;i< queue.tracks.data.length; i += 10){
-            const queueString = queue.tracks.data.slice(0, 10);
-            let j=i;
-            k+=10;
-            const info=queueString.map(song => `${j} - [${song.duration}]\` ${song.title} - <@${song.requestedBy.id}>`).join('\n')
-            const currentSong = queue.currentTrack;
-            const progress=queue.node.createProgressBar();
-            const collector=new EmbedBuilder()
-            .setDescription(`**Currently Playing**\n` + 
-                (currentSong ? `\`[${currentSong.duration}]\` ${currentSong.title} - <@${currentSong.requestedBy.id}>` : "None")
-                +`\n`+progress+
-                `\n\n**Queue**\n${info}`
-            )
-            .setThumbnail(currentSong.thumbnail)
-            embedss.push(collector)
-        }
- 
-
-        let currentPage=0;
-        const msg = await interaction.reply({
-            embeds:[
-                new EmbedBuilder()
-                .setDescription(embedss[currentPage])
-            ],
-        fetchReply:true
-    });
-        await msg.react('⬅️');
-        await msg.react('➡️');
-
-        const collectorFilter = (reaction, interaction) => ['⬅️', '➡️'].includes(reaction.emoji.name) && (interaction.user.id);
-        const collectEmotes=msg.createReactionCollector({ filter: collectorFilter, time: 15000 });
-        collectEmotes.on('collect',async(reaction,user)=>{
-            try {
-                if (reaction.emoji.name === '➡️') {
-                    if (currentPage < embedss.length - 1) {
-                        currentPage++;
-                        msg.edit(`**Current Page - ${currentPage + 1}/${embedss.length}**`, embedss[currentPage]);
-                    } 
-                } else if (reaction.emoji.name === '⬅️') {
-                    if (currentPage !== 0) {
-                        --currentPage;
-                        msg.edit(`**Current Page - ${currentPage + 1}/${embedss.length}**`, embedss[currentPage]);
-                    }
-                } else {
-                    collector.stop();
-                    reaction.message.reactions.removeAll();
-                    msg.delete();
-                }
-                await reaction.users.remove(message.author.id);
-              } catch{
-                console.log("An error occured")
-
-              }
-        })
-        
-    }
-
-}
-
-function generateQueueEmbed(message, queue) {
-    const embeds = [];
-    let k = 10;
-    for (let i = 0; i< queue.tracks.data.length; i += 10) {
-        const current = queue.slice(i, k);
-        let j = i;
-        k += 10;
-        const info = current.map(track => `${++j} - [${track.title}](${track.url})`).join('\n');
-        const embed = new MessageEmbed()
-            .setTitle('Song Queue\n')
-            .setThumbnail(message.guild.iconURL())
-            .setColor("#F8AA2A")
-            .setDescription(`**Current Song - [${queue[0].title}](${queue[0].url})**\n\n${info}`)
-            .setTimestamp();
-        embeds.push(embed);
-    }
-    return embeds;
-}
+curl ^"https://www.youtube.com/youtubei/v1/browse?prettyPrint=false^" ^
+  -H ^"accept: */*^" ^
+  -H ^"accept-language: zh-TW,zh;q=0.9,en-US;q=0.8,en;q=0.7^" ^
+  -H ^"authorization: SAPISIDHASH 1742994373_2de2513b59ec0ad7b9f74211a71670f087601cf1_u SAPISID1PHASH 1742994373_2de2513b59ec0ad7b9f74211a71670f087601cf1_u SAPISID3PHASH 1742994373_2de2513b59ec0ad7b9f74211a71670f087601cf1_u^" ^
+  -H ^"content-type: application/json^" ^
+  -b ^"LOGIN_INFO=AFmmF2swRQIhAIQAbboga6TmA3hsXF6pB_Mp9JttFuCKfNBMzYXJfTNvAiBSmSnWifcl9xZQHPNQxv8X5DGiZ3OiMXA9o-0DxDPUSw:QUQ3MjNmekhwZlFPMmZkSnhOR3IwT29scjdOOEdTbHR2bVFJX05DM2YtXy1zM3lOaDk0VVZhYUhycU90SWg5anRRTTZ5R184MGFMZERLaS10NTFTSkt2enUtRkFqR1RxTkdZZkhfd1V2OG1INGtud1ctWTRmYjQ4bnV3YllaQzNReS1oS3I0YUJ3bzFHYmVrSFpma2ItZ1NncHJhYnZ4MnVScG1JRjZidkdONmQ3THFfOTNtME1IRGp3cnc3aGZ0MnBuZXRhV0xYcFp4R2hQRVFkdlJxWm1nMmNocTI5SlZZZw==; YSC=3-dxTXf6JaM; VISITOR_INFO1_LIVE=y2mWt_UtZyk; VISITOR_PRIVACY_METADATA=CgJISxIEGgAgJA^%^3D^%^3D; wide=1; HSID=AgF6W_Ersph5Kh393; SSID=AU7fzsFxR0Lst439D; APISID=FnpQ_IOmCRW5hrU4/AukR7Z_WHzXYAGbui; SAPISID=6rGdfNOQG9aHW8pO/Aaa0LY0YQ24CnyqYn; __Secure-1PAPISID=6rGdfNOQG9aHW8pO/Aaa0LY0YQ24CnyqYn; __Secure-3PAPISID=6rGdfNOQG9aHW8pO/Aaa0LY0YQ24CnyqYn; SID=g.a000uQjxEPmDxKpbd4pcF_AlQI8RFOeYgGZIYr4QWV8XF0xelzeLgGjvCB5hwYBCXRKsEqba6AACgYKASESARQSFQHGX2Miv5tNacwae9G22oMOre2SqhoVAUF8yKpu1T6Xur0MH2rVHn5chUsH0076; __Secure-1PSID=g.a000uQjxEPmDxKpbd4pcF_AlQI8RFOeYgGZIYr4QWV8XF0xelzeLP5KRQLmlPpPK83UKFCNBKQACgYKAU8SARQSFQHGX2Mi8-S-5paZu1YKzVxLDDt0rxoVAUF8yKrCWO9x3xVnLhbN2MbrerFF0076; __Secure-3PSID=g.a000uQjxEPmDxKpbd4pcF_AlQI8RFOeYgGZIYr4QWV8XF0xelzeLKuL-heUjUacdjpzSqn0M5gACgYKAUgSARQSFQHGX2MiNARIG-2kDI-d69khKzkwDRoVAUF8yKp0jHayrsLNUxa9ueqR3brc0076; PREF=f4=4000000^&tz=Asia.Hong_Kong^&f5=20000^&hl=en^&f6=40000400^&f7=100; __Secure-ROLLOUT_TOKEN=CJKVofy_saOPaxDTiY3hrOuKAxj-766HwqWMAw^%^3D^%^3D; __Secure-1PSIDTS=sidts-CjEB7pHptVYQIzdGtwRin5XvncezMh12hCM6xjAwP74AiDSXZWubBvqKrWnhbzTL5gyhEAA; __Secure-3PSIDTS=sidts-CjEB7pHptVYQIzdGtwRin5XvncezMh12hCM6xjAwP74AiDSXZWubBvqKrWnhbzTL5gyhEAA; ST-amrb2j=session_logininfo=AFmmF2swRQIhAIQAbboga6TmA3hsXF6pB_Mp9JttFuCKfNBMzYXJfTNvAiBSmSnWifcl9xZQHPNQxv8X5DGiZ3OiMXA9o-0DxDPUSw^%^3AQUQ3MjNmekhwZlFPMmZkSnhOR3IwT29scjdOOEdTbHR2bVFJX05DM2YtXy1zM3lOaDk0VVZhYUhycU90SWg5anRRTTZ5R184MGFMZERLaS10NTFTSkt2enUtRkFqR1RxTkdZZkhfd1V2OG1INGtud1ctWTRmYjQ4bnV3YllaQzNReS1oS3I0YUJ3bzFHYmVrSFpma2ItZ1NncHJhYnZ4MnVScG1JRjZidkdONmQ3THFfOTNtME1IRGp3cnc3aGZ0MnBuZXRhV0xYcFp4R2hQRVFkdlJxWm1nMmNocTI5SlZZZw^%^3D^%^3D; SIDCC=AKEyXzUIamTkljf8qK07FnYV_zkDLa940Ejwfex21spVtnfiTAGXpxZMkKua8yS4FyjDJD2GpneR; __Secure-1PSIDCC=AKEyXzU2P8qBYW9a0PRvfAL-wcP9y9P524SRW2VmEPNnMWoV0oRR30e_-lEpoOWjNLRaQ_GcIKg; __Secure-3PSIDCC=AKEyXzUx2k_PsMRA_UQ5dVAqUtvTTwfDWquZOUp15lD658cd7CzRD0HeMbivirVhX3JbHNuf8PlR; ST-1b=disableCache=true^&itct=CBYQsV4iEwjW7Mb756eMAxUfYvUFHXDzFSI^%^3D^&csn=TowuEdYCBx0SfY-x^&session_logininfo=AFmmF2swRQIhAIQAbboga6TmA3hsXF6pB_Mp9JttFuCKfNBMzYXJfTNvAiBSmSnWifcl9xZQHPNQxv8X5DGiZ3OiMXA9o-0DxDPUSw^%^3AQUQ3MjNmekhwZlFPMmZkSnhOR3IwT29scjdOOEdTbHR2bVFJX05DM2YtXy1zM3lOaDk0VVZhYUhycU90SWg5anRRTTZ5R184MGFMZERLaS10NTFTSkt2enUtRkFqR1RxTkdZZkhfd1V2OG1INGtud1ctWTRmYjQ4bnV3YllaQzNReS1oS3I0YUJ3bzFHYmVrSFpma2ItZ1NncHJhYnZ4MnVScG1JRjZidkdONmQ3THFfOTNtME1IRGp3cnc3aGZ0MnBuZXRhV0xYcFp4R2hQRVFkdlJxWm1nMmNocTI5SlZZZw^%^3D^%^3D^&endpoint=^%^7B^%^22clickTrackingParams^%^22^%^3A^%^22CBYQsV4iEwjW7Mb756eMAxUfYvUFHXDzFSI^%^3D^%^22^%^2C^%^22commandMetadata^%^22^%^3A^%^7B^%^22webCommandMetadata^%^22^%^3A^%^7B^%^22url^%^22^%^3A^%^22^%^2F^%^22^%^2C^%^22webPageType^%^22^%^3A^%^22WEB_PAGE_TYPE_BROWSE^%^22^%^2C^%^22rootVe^%^22^%^3A3854^%^2C^%^22apiUrl^%^22^%^3A^%^22^%^2Fyoutubei^%^2Fv1^%^2Fbrowse^%^22^%^7D^%^7D^%^2C^%^22browseEndpoint^%^22^%^3A^%^7B^%^22browseId^%^22^%^3A^%^22FEwhat_to_watch^%^22^%^7D^%^7D; ST-yve142=session_logininfo=AFmmF2swRQIhAIQAbboga6TmA3hsXF6pB_Mp9JttFuCKfNBMzYXJfTNvAiBSmSnWifcl9xZQHPNQxv8X5DGiZ3OiMXA9o-0DxDPUSw^%^3AQUQ3MjNmekhwZlFPMmZkSnhOR3IwT29scjdOOEdTbHR2bVFJX05DM2YtXy1zM3lOaDk0VVZhYUhycU90SWg5anRRTTZ5R184MGFMZERLaS10NTFTSkt2enUtRkFqR1RxTkdZZkhfd1V2OG1INGtud1ctWTRmYjQ4bnV3YllaQzNReS1oS3I0YUJ3bzFHYmVrSFpma2ItZ1NncHJhYnZ4MnVScG1JRjZidkdONmQ3THFfOTNtME1IRGp3cnc3aGZ0MnBuZXRhV0xYcFp4R2hQRVFkdlJxWm1nMmNocTI5SlZZZw^%^3D^%^3D^" ^
+  -H ^"dnt: 1^" ^
+  -H ^"origin: https://www.youtube.com^" ^
+  -H ^"priority: u=1, i^" ^
+  -H ^"referer: https://www.youtube.com/^" ^
+  -H ^"sec-ch-ua: ^\^"Chromium^\^";v=^\^"134^\^", ^\^"Not:A-Brand^\^";v=^\^"24^\^", ^\^"Google Chrome^\^";v=^\^"134^\^"^" ^
+  -H ^"sec-ch-ua-arch: ^\^"x86^\^"^" ^
+  -H ^"sec-ch-ua-bitness: ^\^"64^\^"^" ^
+  -H ^"sec-ch-ua-form-factors: ^\^"Desktop^\^"^" ^
+  -H ^"sec-ch-ua-full-version: ^\^"134.0.6998.118^\^"^" ^
+  -H ^"sec-ch-ua-full-version-list: ^\^"Chromium^\^";v=^\^"134.0.6998.118^\^", ^\^"Not:A-Brand^\^";v=^\^"24.0.0.0^\^", ^\^"Google Chrome^\^";v=^\^"134.0.6998.118^\^"^" ^
+  -H ^"sec-ch-ua-mobile: ?0^" ^
+  -H ^"sec-ch-ua-model: ^\^"^\^"^" ^
+  -H ^"sec-ch-ua-platform: ^\^"Windows^\^"^" ^
+  -H ^"sec-ch-ua-platform-version: ^\^"10.0.0^\^"^" ^
+  -H ^"sec-ch-ua-wow64: ?0^" ^
+  -H ^"sec-fetch-dest: empty^" ^
+  -H ^"sec-fetch-mode: same-origin^" ^
+  -H ^"sec-fetch-site: same-origin^" ^
+  -H ^"user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36^" ^
+  -H ^"x-client-data: CKG1yQEIl7bJAQiktskBCKmdygEI7I7LAQiWocsBCIqjywEInP7MAQiFoM0BCJ3OzgEI3dbOAQiv5M4BCIzlzgEI4eXOAQ==^" ^
+  -H ^"x-goog-authuser: 0^" ^
+  -H ^"x-goog-pageid: 109651771269112919073^" ^
+  -H ^"x-goog-visitor-id: Cgt5Mm1XdF9VdFp5ayi094-_BjIKCgJISxIEGgAgJA^%^3D^%^3D^" ^
+  -H ^"x-origin: https://www.youtube.com^" ^
+  -H ^"x-youtube-bootstrap-logged-in: true^" ^
+  -H ^"x-youtube-client-name: 1^" ^
+  -H ^"x-youtube-client-version: 2.20250324.09.00^" ^
+  --data-raw ^"^{^\^"context^\^":^{^\^"client^\^":^{^\^"hl^\^":^\^"en^\^",^\^"gl^\^":^\^"HK^\^",^\^"remoteHost^\^":^\^"59.188.178.146^\^",^\^"deviceMake^\^":^\^"^\^",^\^"deviceModel^\^":^\^"^\^",^\^"visitorData^\^":^\^"Cgt5Mm1XdF9VdFp5ayi094-_BjIKCgJISxIEGgAgJA^%^3D^%^3D^\^",^\^"userAgent^\^":^\^"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36,gzip(gfe)^\^",^\^"clientName^\^":^\^"WEB^\^",^\^"clientVersion^\^":^\^"2.20250324.09.00^\^",^\^"osName^\^":^\^"Windows^\^",^\^"osVersion^\^":^\^"10.0^\^",^\^"originalUrl^\^":^\^"https://www.youtube.com/^\^",^\^"screenPixelDensity^\^":2,^\^"platform^\^":^\^"DESKTOP^\^",^\^"clientFormFactor^\^":^\^"UNKNOWN_FORM_FACTOR^\^",^\^"configInfo^\^":^{^\^"appInstallData^\^":^\^"CLT3j78GEJmYsQUQ-KuxBRC8784cEIeszhwQ4eywBRC45M4cEPyyzhwQmufOHBDXwbEFEJmNsQUQvoqwBRDr6P4SEO_ZzhwQibDOHBCfy84cEIiHsAUQu9nOHBDgzbEFEOODuCIQiafOHBDt3s4cENuvrwUQk_nOHBDi1K4FELbgrgUQieiuBRDJ5rAFEN_YzhwQjcywBRDu8c4cEIX5_xIQiPLOHBDk5_8SEObjzhwQ29rOHBDg3M4cENPhrwUQgc3OHBCz6c4cEN68zhwQvZmwBRCU_K8FEODg_xIQppqwBRCt8s4cEIS9zhwQyfevBRCRjP8SEKeZzhwQzdGxBRC_vs4cEJPZzhwQnaawBRCZ9M4cEJT-sAUQntvOHBDw4s4cEParsAUQg-7OHBDL0bEFEJ3QsAUQiOOvBRDM364FEL22rgUQt-r-EhCK7f8SELnZzhwQr_POHBDI-P8SEOD4zhwQ5e_OHBCb9s4cEOfWzhwQ5eXOHBDc6M4cELv4_xIqLENBTVNHeFVRb0wyd0ROSGtCdlB0OFF1UDlBN3Ytd2I1N0FQWDNBVWRCdz09^\^",^\^"coldConfigData^\^":^\^"CLT3j78GEPG6rQUQvbauBRDi1K4FEL6KsAUQndCwBRDP0rAFEOP4sAUQpL6xBRDRv7EFENfBsQUQktSxBRCnmc4cEImnzhwQ_LLOHBCfy84cEM7TzhwQ59bOHBDf2M4cEJLbzhwQ4NzOHBDm484cEMvkzhwQ5eXOHBDc6M4cEKjpzhwQs-nOHBCW6s4cENTrzhwQje3OHBCD7s4cEOXvzhwQ7vHOHBCI8s4cEKnzzhwQr_POHBDm884cEJn0zhwQm_bOHBDg-M4cEJP5zhwaMkFPakZveDJiTFZSUjdVZFBLNzRtNGVxM2hsbjEzOXJySk5QbmdOaEFqNUM0cTUzYUNBIjJBT2pGb3gyZ2xacE5xd0JxdWx2b09JRlpRbUZpWkZCNlFzV3dtRFYtM29EMnp0Uk9RUSp0Q0FNU1VRMG51TjIzQXQ0VXpnMlhINmdxdFFTOUZmMER1c2ViRVBJVnR3T1lMWklKOXcwVktwbXh0eC1GcEFXYXV3Yl9XYmlBQWdUbEJLMnZCdU1ScUJYZlc3eXFCdFktdUd6ZDNRWUZzU2p2S1BlQ0JRPT0^%^3D^\^",^\^"coldHashData^\^":^\^"CLT3j78GEhM0MDA5MDg0MTQ0Njc3MzEzMzA4GLT3j78GMjJBT2pGb3gyYkxWUlI3VWRQSzc0bTRlcTNobG4xMzlyckpOUG5nTmhBajVDNHE1M2FDQToyQU9qRm94MmdsWnBOcXdCcXVsdm9PSUZaUW1GaVpGQjZRc1d3bURWLTNvRDJ6dFJPUVFCdENBTVNVUTBudU4yM0F0NFV6ZzJYSDZncXRRUzlGZjBEdXNlYkVQSVZ0d09ZTFpJSjl3MFZLcG14dHgtRnBBV2F1d2JfV2JpQUFnVGxCSzJ2QnVNUnFCWGZXN3lxQnRZLXVHemQzUVlGc1NqdktQZUNCUT09^\^",^\^"hotHashData^\^":^\^"CLT3j78GEhQxMzEzNDE1NDE5NDQ0MzI1MTIwMhi094-_BiiU5PwSKKXQ_RIonpH-EijIyv4SKLfq_hIowIP_EiiRjP8SKIrt_xIo2u7_Eijd8v8SKLz1_xIou_j_EijI-P8SKKD6_xIooPv_EiiH_P8SKOD9_xIyMkFPakZveDJiTFZSUjdVZFBLNzRtNGVxM2hsbjEzOXJySk5QbmdOaEFqNUM0cTUzYUNBOjJBT2pGb3gyZ2xacE5xd0JxdWx2b09JRlpRbUZpWkZCNlFzV3dtRFYtM29EMnp0Uk9RUUIsQ0FNU0hRME1vdGY2RmE3QkJwTk44Z29WQ2QzUHdnekdwLTBMMk0wSnBjQUY^%^3D^\^"^},^\^"screenDensityFloat^\^":1.5,^\^"userInterfaceTheme^\^":^\^"USER_INTERFACE_THEME_DARK^\^",^\^"timeZone^\^":^\^"Asia/Hong_Kong^\^",^\^"browserName^\^":^\^"Chrome^\^",^\^"browserVersion^\^":^\^"134.0.0.0^\^",^\^"acceptHeader^\^":^\^"text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7^\^",^\^"deviceExperimentId^\^":^\^"ChxOelE0TmpFd016YzFOamMxTnpRek56a3hOZz09ELT3j78GGLT3j78G^\^",^\^"rolloutToken^\^":^\^"CJKVofy_saOPaxDTiY3hrOuKAxj-766HwqWMAw^%^3D^%^3D^\^",^\^"screenWidthPoints^\^":1707,^\^"screenHeightPoints^\^":940,^\^"utcOffsetMinutes^\^":480,^\^"memoryTotalKbytes^\^":^\^"8000000^\^",^\^"mainAppWebInfo^\^":^{^\^"graftUrl^\^":^\^"/^\^",^\^"pwaInstallabilityStatus^\^":^\^"PWA_INSTALLABILITY_STATUS_CAN_BE_INSTALLED^\^",^\^"webDisplayMode^\^":^\^"WEB_DISPLAY_MODE_BROWSER^\^",^\^"isWebNativeShareAvailable^\^":true^}^},^\^"user^\^":^{^\^"lockedSafetyMode^\^":false^},^\^"request^\^":^{^\^"useSsl^\^":true,^\^"internalExperimentFlags^\^":^[^],^\^"consistencyTokenJars^\^":^[^]^},^\^"clickTracking^\^":^{^\^"clickTrackingParams^\^":^\^"CBYQsV4iEwjW7Mb756eMAxUfYvUFHXDzFSI=^\^"^},^\^"adSignalsInfo^\^":^{^\^"params^\^":^[^{^\^"key^\^":^\^"dt^\^",^\^"value^\^":^\^"1742994356804^\^"^},^{^\^"key^\^":^\^"flash^\^",^\^"value^\^":^\^"0^\^"^},^{^\^"key^\^":^\^"frm^\^",^\^"value^\^":^\^"0^\^"^},^{^\^"key^\^":^\^"u_tz^\^",^\^"value^\^":^\^"480^\^"^},^{^\^"key^\^":^\^"u_his^\^",^\^"value^\^":^\^"4^\^"^},^{^\^"key^\^":^\^"u_h^\^",^\^"value^\^":^\^"1067^\^"^},^{^\^"key^\^":^\^"u_w^\^",^\^"value^\^":^\^"1707^\^"^},^{^\^"key^\^":^\^"u_ah^\^",^\^"value^\^":^\^"1027^\^"^},^{^\^"key^\^":^\^"u_aw^\^",^\^"value^\^":^\^"1707^\^"^},^{^\^"key^\^":^\^"u_cd^\^",^\^"value^\^":^\^"24^\^"^},^{^\^"key^\^":^\^"bc^\^",^\^"value^\^":^\^"31^\^"^},^{^\^"key^\^":^\^"bih^\^",^\^"value^\^":^\^"940^\^"^},^{^\^"key^\^":^\^"biw^\^",^\^"value^\^":^\^"1692^\^"^},^{^\^"key^\^":^\^"brdim^\^",^\^"value^\^":^\^"0,0,0,0,1707,0,1707,1027,1707,940^\^"^},^{^\^"key^\^":^\^"vis^\^",^\^"value^\^":^\^"1^\^"^},^{^\^"key^\^":^\^"wgl^\^",^\^"value^\^":^\^"true^\^"^},^{^\^"key^\^":^\^"ca_type^\^",^\^"value^\^":^\^"image^\^"^}^]^}^},^\^"browseId^\^":^\^"FEwhat_to_watch^\^",^\^"inlineSettingStatus^\^":^\^"INLINE_SETTING_STATUS_ON^\^"^}^"

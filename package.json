@@ -17,6 +17,7 @@
     "@distube/ytdl-core": "^4.13.5",
     "discord-api-types": "^0.37.28",
     "discord-player": "^7.1.0",
+    "discord-player-deezer": "^2.4.0",
     "discord-player-youtubei": "^1.4.2",
     "discord.js": "14.18",
     "dotenv": "^16.0.3",

@@ -17,6 +17,7 @@ const { VoiceConnection, joinVoiceChannel } = require("@discordjs/voice");
 const { DefaultExtractors } = require("@discord-player/extractor");
 // const welcome =require("./welcome");
 const { YoutubeiExtractor,generateOauthTokens } = require("discord-player-youtubei");
+const { DeezerExtractor, NodeDecryptor } = require("discord-player-deezer")
 
 const client = new Client({
   intents: [
@@ -31,7 +32,7 @@ const client = new Client({
     GatewayIntentBits.GuildVoiceStates,
   ],
 });
-//console.log("This is oauth",generateOauthTokens())
+// console.log("This is oauth",generateOauthTokens())
 // List of all commands
 const commands = [];
 client.commands = new Collection();
@@ -60,12 +61,24 @@ client.player = new Player(client, {
     options: "-vn",
   },
 });
+
 extractors.push(YoutubeiExtractor)
 console.log("Extractors", extractors);
+client.player.extractors.register(DeezerExtractor,{
+  decryptionKey: process.env.DEEZER_MASTER_KEY,
+  arl: process.env.DEEZER_ARL_COOKIE,
+  decryptor: NodeDecryptor,
+  reloadUserInterval: 9 * 60 * 60 * 1000,
+})
 client.player.extractors.register(YoutubeiExtractor,{
-    authentication:process.env.YOUTUBE_ACCESS_STRING||"",
+    // authentication:process.env.YOUTUBE_ACCESS_STRING||"",
+    generateWithPoToken:true,
+    cookie: process.env.COOKIE,
+    overrideDownloadOptions: 'mp4a',
+    overrideBridgeMode: 'yt',
+    slicePlaylist:true,
      streamOptions:{
-         useClient:"IOS"
+         useClient:"WEB"
      }
 })
 client.player.extractors.loadMulti([YoutubeiExtractor]);
