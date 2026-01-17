@@ -64,35 +64,35 @@ client.player = new Player(client, {
 
 extractors.push(YoutubeiExtractor)
 console.log("Extractors", extractors);
-client.player.extractors.register(DeezerExtractor,{
-  decryptionKey: process.env.DEEZER_MASTER_KEY,
-  arl: process.env.DEEZER_ARL_COOKIE,
-  decryptor: NodeDecryptor,
-  reloadUserInterval: 9 * 60 * 60 * 1000,
-})
+// client.player.extractors.register(DeezerExtractor,{
+//   decryptionKey: process.env.DEEZER_MASTER_KEY,
+//   arl: process.env.DEEZER_COOKIE,
+//   decryptor: NodeDecryptor,
+//   reloadUserInterval: 9 * 60 * 60 * 1000,
+// })
 client.player.extractors.register(YoutubeiExtractor,{
     // authentication:process.env.YOUTUBE_ACCESS_STRING||"",
     generateWithPoToken:true,
-    cookie: process.env.COOKIE,
-    overrideDownloadOptions: 'mp4a',
+    // cookie: process.env.COOKIE,
+    // overrideDownloadOptions: 'mp4a',
     overrideBridgeMode: 'yt',
     slicePlaylist:true,
      streamOptions:{
-         useClient:"WEB"
+         useClient:"IOS"
      }
 })
 client.player.extractors.loadMulti([YoutubeiExtractor]);
 // client.player.extractors.loadDefault();
 console.log(client.player.scanDeps());
 client.on("debug", (message) => console.log(message));
+
 client.on("ready", () => {
   // Get all ids of the servers
   const guild_ids = client.guilds.cache.map((guild) => guild.id);
-
-  const rest = new REST({ version: "9" }).setToken(process.env.TOKEN);
+  const rest = new REST({ version: "9" }).setToken(process.env.TOKEN_BOCCHI);
   for (const guildId of guild_ids) {
     rest
-      .put(Routes.applicationGuildCommands(process.env.CLIENT_ID, guildId), {
+      .put(Routes.applicationGuildCommands(process.env.CLIENT_ID_BOCCHI, guildId), {
         body: commands,
       })
       .then(() =>
@@ -152,4 +152,4 @@ client.player.on("connectionCreate", (queue) => {
     }
   });
 });
-client.login(process.env.TOKEN);
+client.login(process.env.TOKEN_BOCCHI);

