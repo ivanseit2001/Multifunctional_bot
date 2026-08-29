@@ -71,15 +71,9 @@ console.log("Extractors", extractors);
 //   reloadUserInterval: 9 * 60 * 60 * 1000,
 // })
 client.player.extractors.register(YoutubeiExtractor,{
-    // authentication:process.env.YOUTUBE_ACCESS_STRING||"",
-    generateWithPoToken:true,
-    // cookie: process.env.COOKIE,
-    // overrideDownloadOptions: 'mp4a',
-    overrideBridgeMode: 'yt',
-    slicePlaylist:true,
-     streamOptions:{
-         useClient:"IOS"
-     }
+  cookie: process.env.cookie,
+  logLevel: "ALL",
+  useYoutubeDL: true,
 })
 client.player.extractors.loadMulti([YoutubeiExtractor]);
 // client.player.extractors.loadDefault();
